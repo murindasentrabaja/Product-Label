@@ -26,7 +26,7 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f9; /* Warna dasar terang yang elegan */
+            background-color: #f0f4f9; 
             margin: 0;
             padding: 0;
             position: relative;
@@ -111,7 +111,6 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            /* Efek Teks Gradasi Gemini */
             background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-green), var(--gemini-orange));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -188,7 +187,6 @@
             text-align: center;
             margin-top: 30px;
             font-size: 16px;
-            /* Animasi Teks Loading */
             background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-green), var(--gemini-orange), var(--gemini-blue));
             background-size: 300% auto;
             color: transparent;
@@ -379,7 +377,7 @@
             color: #444;
         }
 
-        /* --- PRINT CONFIGURATION (Mereset efek visual layar saat dicetak) --- */
+        /* --- PRINT CONFIGURATION --- */
         @media print {
             body { 
                 background: white !important; 
@@ -387,7 +385,7 @@
                 padding: 0;
             }
             body::before, body::after {
-                display: none !important; /* Mematikan blob gradient */
+                display: none !important; 
             }
             .control-panel, .loading { display: none !important; }
             #printArea { 
@@ -437,7 +435,6 @@
     <div id="printArea"></div>
 
     <script>
-        // MASUKKAN LINK DEPLOY APPS SCRIPT ANDA DI SINI
         const API_URL = "https://script.google.com/macros/s/AKfycbz26smq-nupLejeT557IjQdHzn664R8DTHw5F-sG0ovntloObT0AJmcY4blQHFEhLy-wA/exec";
         
         let spreadsheetData = [];
@@ -618,6 +615,28 @@
                 loadingText.style.webkitTextFillColor = "red";
             }
         }
+
+        // ==========================================
+        // FITUR BARU: AUTO-LOAD DATA HARI INI
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('deliveryDate');
+            
+            // Dapatkan tanggal hari ini
+            const today = new Date();
+            
+            // Format ke YYYY-MM-DD sesuai standar input type="date"
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const formattedToday = `${year}-${month}-${day}`;
+            
+            // Atur nilai default pada elemen input
+            dateInput.value = formattedToday;
+            
+            // Jalankan fungsi penarikan data secara otomatis
+            fetchAndGenerate();
+        });
     </script>
 </body>
 </html>
