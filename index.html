@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labeling System - PT Murinda Sentra Baja</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #001359; 
+            --accent-color: #c91414; 
+            --gemini-blue: #1a73e8;
+            --gemini-green: #34a853;
+            --gemini-orange: #f9ab00;
+            --border-color: #1a1a1a;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f9; /* Warna dasar terang yang elegan */
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- EFEK VISUAL BACKGROUND "HIDUP" (Gemini Vibe) --- */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 60vw;
+            height: 60vw;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            z-index: -1;
+            animation: float 25s infinite alternate ease-in-out;
+        }
+
+        body::before {
+            background: radial-gradient(circle, var(--gemini-blue) 0%, var(--gemini-green) 100%);
+            top: -10vw;
+            left: -10vw;
+        }
+
+        body::after {
+            background: radial-gradient(circle, var(--gemini-orange) 0%, #ea4335 100%);
+            bottom: -10vw;
+            right: -10vw;
+            animation-delay: -12.5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(8vw, 4vw) scale(1.1); }
+            100% { transform: translate(-4vw, 8vw) scale(0.9); }
+        }
+
+        /* --- CONTROL PANEL (GLASSMORPHISM) --- */
+        .control-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 15px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-right: auto;
+            gap: 2px;
+        }
+
+        .brand-container img {
+            height: 38px;
+            width: auto;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .company-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+
+        .brand-container h2 {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            /* Efek Teks Gradasi Gemini */
+            background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-green), var(--gemini-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+        }
+
+        input[type="date"] {
+            padding: 10px 14px;
+            border: 1px solid rgba(0,0,0,0.15);
+            border-radius: 8px;
+            font-family: inherit;
+            outline: none;
+            background: rgba(255,255,255,0.9);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        input[type="date"]:focus {
+            border-color: var(--gemini-blue);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-fetch { 
+            background: linear-gradient(135deg, var(--gemini-blue), var(--gemini-green)); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(52, 168, 83, 0.3);
+        }
+        
+        .btn-fetch:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 168, 83, 0.5);
+        }
+
+        .btn-print { 
+            background: linear-gradient(135deg, var(--gemini-orange), #e53935); 
+            color: white; 
+            display: none; 
+            box-shadow: 0 4px 15px rgba(249, 171, 0, 0.3);
+        }
+
+        .btn-print:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(249, 171, 0, 0.5);
+        }
+
+        .loading {
+            display: none;
+            font-weight: 800;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 16px;
+            /* Animasi Teks Loading */
+            background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-green), var(--gemini-orange), var(--gemini-blue));
+            background-size: 300% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 2s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 300% center; }
+        }
+
+        /* --- LAYOUT MULTI-LABEL A4 --- */
+        #printArea {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            gap: 40px;
+            width: 100%;
+        }
+
+        .a4-page {
+            width: 210mm;
+            height: 296mm;
+            background-color: white;
+            padding: 10mm;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8mm;
+            justify-content: center;
+            box-sizing: border-box;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.7) inset;
+            border-radius: 8px;
+            page-break-after: always;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- DESAIN LABEL --- */
+        .label-card {
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4mm;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            background-color: #fff;
+            box-sizing: border-box;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .label-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .label-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+
+        .label-header img {
+            max-width: 100px;
+            height: auto;
+        }
+
+        .label-title {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .label-title .title-top {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 2px;
+            line-height: 1;
+        }
+
+        .label-title .title-bottom {
+            font-size: 10px;
+            font-weight: 600;
+            color: #555;
+            letter-spacing: 3.5px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            line-height: 1;
+        }
+
+        .label-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .data-group { display: flex; flex-direction: column; }
+
+        .data-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 1px;
+        }
+
+        .data-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: #000;
+        }
+        
+        .part-name { font-size: 13px; color: var(--primary-color); }
+
+        .barcode-container {
+            text-align: center;
+            margin-top: 2px;
+            padding: 4px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        
+        .barcode-container svg { max-height: 30px; width: 100%; }
+
+        .row-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px;
+            gap: 8px;
+        }
+
+        .qr-container {
+            width: 55px;
+            height: 55px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            align-self: center;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 0.8fr;
+            gap: 5px;
+            border-top: 1.5px dashed #aaa;
+            padding-top: 6px;
+            margin-top: auto;
+        }
+
+        .serial-box {
+            word-break: break-all;
+            max-height: 35px;
+            overflow: hidden;
+            font-size: 11px;
+        }
+
+        .qty-badge {
+            font-size: 16px;
+            color: var(--accent-color);
+            text-align: right;
+        }
+
+        .label-footer {
+            margin-top: 6px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 7.5px;
+            color: #444;
+        }
+
+        /* --- PRINT CONFIGURATION (Mereset efek visual layar saat dicetak) --- */
+        @media print {
+            body { 
+                background: white !important; 
+                margin: 0;
+                padding: 0;
+            }
+            body::before, body::after {
+                display: none !important; /* Mematikan blob gradient */
+            }
+            .control-panel, .loading { display: none !important; }
+            #printArea { 
+                padding: 0; 
+                gap: 0; 
+                display: flex;
+                align-items: center; 
+                justify-content: center;
+                width: 100%;
+            }
+            .a4-page {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 auto;
+                page-break-after: always;
+            }
+            .label-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            @page {
+                size: A4;
+                margin: 0mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <div class="brand-container">
+            <img src="Murinda Logo.png" alt="Logo PT Murinda Sentra Baja">
+            <div class="company-name"></div>
+            <h2>Product Label System</h2>
+        </div>
+
+        <div class="input-group">
+            <label for="deliveryDate">Pilih Tanggal Pengiriman :</label>
+            <input type="date" id="deliveryDate">
+        </div>
+        <button class="btn-fetch" onclick="fetchAndGenerate()">Proses Data</button>
+        <button class="btn-print" id="btnPrint" onclick="window.print()">🖨️ Print Label</button>
+    </div>
+
+    <div class="loading" id="loadingText">Menyinkronkan data dari MSB ERP System...</div>
+    
+    <div id="printArea"></div>
+
+    <script>
+        // MASUKKAN LINK DEPLOY APPS SCRIPT ANDA DI SINI
+        const API_URL = "https://script.google.com/macros/s/AKfycbz26smq-nupLejeT557IjQdHzn664R8DTHw5F-sG0ovntloObT0AJmcY4blQHFEhLy-wA/exec";
+        
+        let spreadsheetData = [];
+
+        function parseSheetDate(dateStr) {
+            if (!dateStr) return "";
+            let cleanStr = dateStr.toString().trim().replace(/[\/ ]/g, '-');
+            let parts = cleanStr.split('-');
+            
+            if(parts.length === 3) {
+                const monthMap = {
+                    'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04', 'mei': '05', 'may': '05',
+                    'jun': '06', 'jul': '07', 'agu': '08', 'aug': '08', 'sep': '09', 'okt': '10',
+                    'oct': '10', 'nov': '11', 'des': '12', 'dec': '12'
+                };
+                let day = parts[0].padStart(2, '0');
+                let monthName = parts[1].toLowerCase().substring(0, 3);
+                let month = isNaN(parts[1]) ? (monthMap[monthName] || '01') : parts[1].padStart(2, '0');
+                let year = parts[2];
+                if (year.length === 2) year = '20' + year;
+                return `${year}-${month}-${day}`;
+            }
+            return dateStr;
+        }
+
+        async function fetchAndGenerate() {
+            const dateInput = document.getElementById('deliveryDate').value;
+            const loadingText = document.getElementById('loadingText');
+            const printArea = document.getElementById('printArea');
+            const btnPrint = document.getElementById('btnPrint');
+
+            if (!dateInput) {
+                alert("Silakan pilih Delivery Date terlebih dahulu!");
+                return;
+            }
+
+            printArea.innerHTML = '';
+            loadingText.style.display = 'block';
+            loadingText.style.color = "transparent";
+            loadingText.innerHTML = "Menyinkronkan data dari MSB ERP System...";
+            btnPrint.style.display = 'none';
+
+            try {
+                if(spreadsheetData.length === 0) {
+                    const response = await fetch(API_URL);
+                    spreadsheetData = await response.json();
+                }
+
+                loadingText.style.display = 'none';
+                
+                const filteredData = spreadsheetData.filter(row => {
+                    let sheetDate = row["Delivery Date"];
+                    return sheetDate ? parseSheetDate(sheetDate) === dateInput : false;
+                });
+
+                if (filteredData.length === 0) {
+                    printArea.innerHTML = `<p style="color:red; font-weight:bold; font-size:16px;">Tidak ada jadwal pengiriman untuk tanggal ${dateInput}</p>`;
+                    return;
+                }
+
+                const groupedMap = {};
+                filteredData.forEach(row => {
+                    const po = row["PO Number"] ? row["PO Number"].trim() : "UNKNOWN";
+                    
+                    let rawSn = row["Serial Number"] ? row["Serial Number"].toString().trim() : "";
+                    let snMatch = rawSn.match(/\d+$/);
+                    let shortSn = snMatch ? snMatch[0].padStart(3, '0').slice(-3) : "000";
+
+                    if (!groupedMap[po]) {
+                        groupedMap[po] = {
+                            poNumber: po,
+                            unitNumber: row["Unit Number"] || "-",
+                            partName: row["Part Name"] || "Counterweight Excavator",
+                            partNumber: row["Part Number"] || "-",
+                            serialNumbers: [shortSn],
+                            qty: 1
+                        };
+                    } else {
+                        groupedMap[po].serialNumbers.push(shortSn);
+                        groupedMap[po].qty = groupedMap[po].serialNumbers.length;
+                    }
+                });
+
+                const finalLabelsData = Object.values(groupedMap);
+                let currentPageDiv = null;
+                
+                finalLabelsData.forEach((labelItem, index) => {
+                    if (index % 6 === 0) {
+                        currentPageDiv = document.createElement('div');
+                        currentPageDiv.className = 'a4-page';
+                        printArea.appendChild(currentPageDiv);
+                    }
+
+                    const printTime = new Date().toLocaleString('id-ID');
+                    const sortedSerials = labelItem.serialNumbers.sort().join(', ');
+
+                    const labelHTML = `
+                        <div class="label-card">
+                            <div class="label-header">
+                                <img src="MSB Logo White.png" alt="PT Murinda Sentra Baja">
+                                <div class="label-title">
+                                    <div class="title-top">Product</div>
+                                    <div class="title-bottom">LABEL</div>
+                                </div>
+                            </div>
+                            
+                            <div class="label-body">
+                                <div class="data-group">
+                                    <div class="data-label">PO Number</div>
+                                    <div class="data-value">${labelItem.poNumber}</div>
+                                    <div class="barcode-container">
+                                        <svg id="barcode-${index}"></svg>
+                                    </div>
+                                </div>
+
+                                <div class="row-flex">
+                                    <div class="data-group" style="width: 70%;">
+                                        <div class="data-label">Part Name</div>
+                                        <div class="data-value part-name">${labelItem.partName}</div>
+                                        <div class="data-label" style="margin-top: 4px;">Part Number</div>
+                                        <div class="data-value" style="font-size:12px;">${labelItem.partNumber}</div>
+                                    </div>
+                                    <div class="qr-container" id="qrcode-${index}"></div>
+                                </div>
+
+                                <div class="grid-3">
+                                    <div class="data-group">
+                                        <div class="data-label">Unit Number</div>
+                                        <div class="data-value" style="font-size: 11px;">${labelItem.unitNumber}</div>
+                                    </div>
+                                    <div class="data-group">
+                                        <div class="data-label">Serial Number</div>
+                                        <div class="data-value serial-box">${sortedSerials}</div>
+                                    </div>
+                                    <div class="data-group">
+                                        <div class="data-label" style="text-align:right;">Qty</div>
+                                        <div class="data-value qty-badge">${labelItem.qty} PCS</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="label-footer">
+                                <div><strong>Cetak:</strong> ${printTime}</div>
+                                <div class="license">PT Murinda Sentra Baja, Kalijati - Subang</div>
+                            </div>
+                        </div>
+                    `;
+
+                    currentPageDiv.insertAdjacentHTML('beforeend', labelHTML);
+
+                    // Barcode PO
+                    JsBarcode(`#barcode-${index}`, labelItem.poNumber, {
+                        format: "CODE128",
+                        width: 1.8,
+                        height: 25,
+                        displayValue: false,
+                        margin: 0
+                    });
+
+                    // QR Part Number
+                    new QRCode(document.getElementById(`qrcode-${index}`), {
+                        text: labelItem.partNumber,
+                        width: 55,
+                        height: 55,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.M
+                    });
+                });
+
+                btnPrint.style.display = 'block';
+
+            } catch (error) {
+                console.error("Error:", error);
+                loadingText.innerHTML = "Gagal memproses data. Cek koneksi internet dan link deploy Anda.";
+                loadingText.style.color = "red";
+                loadingText.style.background = "none";
+                loadingText.style.webkitTextFillColor = "red";
+            }
+        }
+    </script>
+</body>
+</html>
