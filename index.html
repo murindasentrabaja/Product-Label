@@ -34,7 +34,7 @@
             min-height: 100vh;
         }
 
-        /* --- EFEK VISUAL BACKGROUND "HIDUP" (Gemini Vibe) --- */
+        /* --- EFEK VISUAL BACKGROUND "HIDUP" --- */
         body::before, body::after {
             content: '';
             position: fixed;
@@ -129,7 +129,7 @@
             font-size: 13px;
         }
 
-        input[type="date"] {
+        input[type="date"], select {
             padding: 10px 14px;
             border: 1px solid rgba(0,0,0,0.15);
             border-radius: 8px;
@@ -138,9 +138,10 @@
             background: rgba(255,255,255,0.9);
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        input[type="date"]:focus {
+        input[type="date"]:focus, select:focus {
             border-color: var(--gemini-blue);
             box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25);
         }
@@ -156,17 +157,6 @@
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        .btn-fetch { 
-            background: linear-gradient(135deg, var(--gemini-blue), var(--gemini-green)); 
-            color: white; 
-            box-shadow: 0 4px 15px rgba(52, 168, 83, 0.3);
-        }
-        
-        .btn-fetch:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(52, 168, 83, 0.5);
         }
 
         .btn-print { 
@@ -228,6 +218,34 @@
             z-index: 2;
         }
 
+        /* --- STYLING GARIS POTONG (CUTTING LINES) --- */
+        .cut-line {
+            position: absolute;
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* Garis potong vertikal tepat di tengah halaman (105mm) */
+        .cut-vertical {
+            left: 105mm;
+            top: 0;
+            bottom: 0;
+            border-left: 1px dashed #555;
+        }
+        /* Garis potong horizontal baris pertama */
+        .cut-horizontal-1 {
+            top: 100.67mm;
+            left: 0;
+            right: 0;
+            border-top: 1px dashed #555;
+        }
+        /* Garis potong horizontal baris kedua */
+        .cut-horizontal-2 {
+            top: 195.33mm;
+            left: 0;
+            right: 0;
+            border-top: 1px dashed #555;
+        }
+
         /* --- DESAIN LABEL --- */
         .label-card {
             border: 2px solid var(--border-color);
@@ -240,6 +258,7 @@
             background-color: #fff;
             box-sizing: border-box;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 3; /* Berada di atas garis potong agar tidak mengganggu isi data */
         }
 
         .label-card:hover {
@@ -417,20 +436,27 @@
 
     <div class="control-panel">
         <div class="brand-container">
-            <img src="Murinda Logo.png" alt="Logo PT Murinda Sentra Baja">
+            <img src="MSB Logo White.png" alt="Logo PT Murinda Sentra Baja" onerror="this.src='Murinda Logo.png'">
             <div class="company-name"></div>
             <h2>Product Label System</h2>
         </div>
 
         <div class="input-group">
             <label for="deliveryDate">Pilih Tanggal Pengiriman :</label>
-            <input type="date" id="deliveryDate">
+            <input type="date" id="deliveryDate" onchange="fetchAndGenerate()">
         </div>
-        <button class="btn-fetch" onclick="fetchAndGenerate()">Proses Data</button>
+
+        <div class="input-group">
+            <label for="clientFilter">Pilih Client :</label>
+            <select id="clientFilter" onchange="fetchAndGenerate()">
+                <option value="">-- Semua Client --</option>
+            </select>
+        </div>
+
         <button class="btn-print" id="btnPrint" onclick="window.print()">🖨️ Print Label</button>
     </div>
 
-    <div class="loading" id="loadingText">Menyinkronkan data dari MSB ERP System...</div>
+    <div class="loading" id="loadingText">Menginisialisasi sistem...</div>
     
     <div id="printArea"></div>
 
@@ -438,6 +464,59 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbz26smq-nupLejeT557IjQdHzn664R8DTHw5F-sG0ovntloObT0AJmcY4blQHFEhLy-wA/exec";
         
         let spreadsheetData = [];
+
+        // 1. EVENT KETIKA HALAMAN PERTAMA KALI DIBUKA
+        window.addEventListener('DOMContentLoaded', async () => {
+            const dateInput = document.getElementById('deliveryDate');
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            dateInput.value = `${yyyy}-${mm}-${dd}`;
+
+            const loadingText = document.getElementById('loadingText');
+            
+            loadingText.style.display = 'block';
+            loadingText.innerHTML = "Memuat data dari sistem...";
+            
+            document.getElementById('deliveryDate').disabled = true;
+            document.getElementById('clientFilter').disabled = true;
+
+            try {
+                const response = await fetch(API_URL);
+                spreadsheetData = await response.json();
+                
+                const clients = new Set();
+                spreadsheetData.forEach(row => {
+                    if(row["Client"] && row["Client"].toString().trim() !== "") {
+                        clients.add(row["Client"].toString().trim());
+                    }
+                });
+
+                const clientSelect = document.getElementById('clientFilter');
+                Array.from(clients).sort().forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.toLowerCase();
+                    option.textContent = client;
+                    clientSelect.appendChild(option);
+                });
+
+                loadingText.style.display = 'none';
+                
+                document.getElementById('deliveryDate').disabled = false;
+                document.getElementById('clientFilter').disabled = false;
+
+                // Tampilkan data otomatis di awal
+                fetchAndGenerate();
+
+            } catch (error) {
+                console.error("Error fetching initial data:", error);
+                loadingText.innerHTML = "Gagal memuat data awal. Silakan refresh halaman.";
+                loadingText.style.color = "red";
+                loadingText.style.background = "none";
+                loadingText.style.webkitTextFillColor = "red";
+            }
+        });
 
         function parseSheetDate(dateStr) {
             if (!dateStr) return "";
@@ -462,19 +541,19 @@
 
         async function fetchAndGenerate() {
             const dateInput = document.getElementById('deliveryDate').value;
+            const clientInput = document.getElementById('clientFilter').value; 
             const loadingText = document.getElementById('loadingText');
             const printArea = document.getElementById('printArea');
             const btnPrint = document.getElementById('btnPrint');
 
             if (!dateInput) {
-                alert("Silakan pilih Delivery Date terlebih dahulu!");
-                return;
+                return; 
             }
 
             printArea.innerHTML = '';
             loadingText.style.display = 'block';
             loadingText.style.color = "transparent";
-            loadingText.innerHTML = "Menyinkronkan data dari MSB ERP System...";
+            loadingText.innerHTML = "Memproses data label...";
             btnPrint.style.display = 'none';
 
             try {
@@ -487,11 +566,16 @@
                 
                 const filteredData = spreadsheetData.filter(row => {
                     let sheetDate = row["Delivery Date"];
-                    return sheetDate ? parseSheetDate(sheetDate) === dateInput : false;
+                    let isDateMatch = sheetDate ? parseSheetDate(sheetDate) === dateInput : false;
+                    
+                    let sheetClient = row["Client"] ? row["Client"].toString().toLowerCase().trim() : "";
+                    let isClientMatch = clientInput === "" || sheetClient === clientInput;
+
+                    return isDateMatch && isClientMatch;
                 });
 
                 if (filteredData.length === 0) {
-                    printArea.innerHTML = `<p style="color:red; font-weight:bold; font-size:16px;">Tidak ada jadwal pengiriman untuk tanggal ${dateInput}</p>`;
+                    printArea.innerHTML = `<p style="color:red; font-weight:bold; font-size:16px;">Tidak ada jadwal pengiriman untuk tanggal & client tersebut.</p>`;
                     return;
                 }
 
@@ -525,6 +609,19 @@
                     if (index % 6 === 0) {
                         currentPageDiv = document.createElement('div');
                         currentPageDiv.className = 'a4-page';
+                        
+                        // Menambahkan elemen garis potong ke setiap halaman baru yang terbentuk
+                        const lineV = document.createElement('div');
+                        lineV.className = 'cut-line cut-vertical';
+                        const lineH1 = document.createElement('div');
+                        lineH1.className = 'cut-line cut-horizontal-1';
+                        const lineH2 = document.createElement('div');
+                        lineH2.className = 'cut-line cut-horizontal-2';
+                        
+                        currentPageDiv.appendChild(lineV);
+                        currentPageDiv.appendChild(lineH1);
+                        currentPageDiv.appendChild(lineH2);
+                        
                         printArea.appendChild(currentPageDiv);
                     }
 
@@ -534,7 +631,7 @@
                     const labelHTML = `
                         <div class="label-card">
                             <div class="label-header">
-                                <img src="MSB Logo White.png" alt="PT Murinda Sentra Baja">
+                                <img src="MSB Logo White.png" alt="PT Murinda Sentra Baja" onerror="this.src='Murinda Logo.png'">
                                 <div class="label-title">
                                     <div class="title-top">Product</div>
                                     <div class="title-bottom">LABEL</div>
@@ -615,28 +712,6 @@
                 loadingText.style.webkitTextFillColor = "red";
             }
         }
-
-        // ==========================================
-        // FITUR BARU: AUTO-LOAD DATA HARI INI
-        // ==========================================
-        window.addEventListener('DOMContentLoaded', () => {
-            const dateInput = document.getElementById('deliveryDate');
-            
-            // Dapatkan tanggal hari ini
-            const today = new Date();
-            
-            // Format ke YYYY-MM-DD sesuai standar input type="date"
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            const formattedToday = `${year}-${month}-${day}`;
-            
-            // Atur nilai default pada elemen input
-            dateInput.value = formattedToday;
-            
-            // Jalankan fungsi penarikan data secara otomatis
-            fetchAndGenerate();
-        });
     </script>
 </body>
 </html>
