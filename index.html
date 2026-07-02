@@ -5,36 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Labeling System - PT Murinda Sentra Baja</title>
     
+    <!-- Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
+            /* Corporate & Aesthetic Colors */
             --primary-color: #001359; 
             --accent-color: #c91414; 
             --gemini-blue: #1a73e8;
-            --gemini-green: #34a853;
+            --gemini-green: #10b981; /* Emerald */
             --gemini-orange: #f9ab00;
-            --border-color: #1a1a1a;
+            --surface-color: #ffffff;
+            --background-app: #f0f4f9;
+            --border-light: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
         }
         
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f9; 
-            margin: 0;
-            padding: 0;
+            background-color: var(--background-app);
             position: relative;
             overflow-x: hidden;
             min-height: 100vh;
+            color: var(--text-main);
         }
 
-        /* --- EFEK VISUAL BACKGROUND "HIDUP" --- */
+        /* --- EFEK VISUAL BACKGROUND DIGITAL "HIDUP" --- */
         body::before, body::after {
             content: '';
             position: fixed;
@@ -42,9 +50,9 @@
             height: 60vw;
             border-radius: 50%;
             filter: blur(120px);
-            opacity: 0.4;
+            opacity: 0.35;
             z-index: -1;
-            animation: float 25s infinite alternate ease-in-out;
+            animation: float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body::before {
@@ -57,29 +65,29 @@
             background: radial-gradient(circle, var(--gemini-orange) 0%, #ea4335 100%);
             bottom: -10vw;
             right: -10vw;
-            animation-delay: -12.5s;
+            animation-delay: -10s;
         }
 
         @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(8vw, 4vw) scale(1.1); }
-            100% { transform: translate(-4vw, 8vw) scale(0.9); }
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(5vw, 5vw) scale(1.05) rotate(5deg); }
+            100% { transform: translate(-3vw, 8vw) scale(0.95) rotate(-5deg); }
         }
 
-        /* --- CONTROL PANEL (GLASSMORPHISM) --- */
+        /* --- CONTROL PANEL (GLASSMORPHISM ELEGAN) --- */
         .control-panel {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 15px 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px 32px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .brand-container {
@@ -87,28 +95,20 @@
             flex-direction: column;
             align-items: flex-start;
             margin-right: auto;
-            gap: 2px;
-        }
-
-        .brand-container img {
-            height: 38px;
-            width: auto;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
         .company-name {
             font-size: 11px;
-            font-weight: 700;
-            color: #444;
+            font-weight: 800;
+            color: var(--primary-color);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 6px;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
         }
 
         .brand-container h2 {
-            margin: 0;
-            font-size: 19px;
-            font-weight: 800;
+            font-size: 20px;
+            font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-green), var(--gemini-orange));
@@ -120,63 +120,64 @@
         .input-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .input-group label {
-            font-weight: 600;
-            color: #333;
+            font-weight: 700;
+            color: var(--text-main);
             font-size: 13px;
         }
 
         input[type="date"], select {
-            padding: 10px 14px;
-            border: 1px solid rgba(0,0,0,0.15);
-            border-radius: 8px;
+            padding: 10px 16px;
+            border: 2px solid var(--border-light);
+            border-radius: 10px;
             font-family: inherit;
+            font-weight: 600;
+            color: var(--text-main);
             outline: none;
-            background: rgba(255,255,255,0.9);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            background: var(--surface-color);
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
         input[type="date"]:focus, select:focus {
             border-color: var(--gemini-blue);
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.25);
+            box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.15);
         }
 
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
-            font-weight: 700;
+            border-radius: 10px;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: inherit;
             font-size: 13px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         .btn-print { 
-            background: linear-gradient(135deg, var(--gemini-orange), #e53935); 
+            background: linear-gradient(135deg, var(--gemini-orange), #ea4335); 
             color: white; 
             display: none; 
-            box-shadow: 0 4px 15px rgba(249, 171, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(249, 171, 0, 0.4);
         }
 
         .btn-print:hover { 
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(249, 171, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(249, 171, 0, 0.6);
         }
 
         .loading {
             display: none;
             font-weight: 800;
             text-align: center;
-            margin-top: 30px;
-            font-size: 16px;
+            margin-top: 40px;
+            font-size: 18px;
             background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-green), var(--gemini-orange), var(--gemini-blue));
             background-size: 300% auto;
             color: transparent;
@@ -194,7 +195,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px 20px;
+            padding: 40px 20px;
             gap: 40px;
             width: 100%;
         }
@@ -210,74 +211,93 @@
             gap: 8mm;
             justify-content: center;
             box-sizing: border-box;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.7) inset;
-            border-radius: 8px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.1);
+            border-radius: 12px;
             page-break-after: always;
             margin: 0 auto;
             position: relative;
             z-index: 2;
         }
 
-        /* --- STYLING GARIS POTONG (CUTTING LINES) --- */
+        /* --- STYLING GARIS POTONG --- */
         .cut-line {
             position: absolute;
             z-index: 1;
             pointer-events: none;
         }
-        /* Garis potong vertikal tepat di tengah halaman (105mm) */
         .cut-vertical {
             left: 105mm;
             top: 0;
             bottom: 0;
-            border-left: 1px dashed #555;
+            border-left: 1px dashed #cbd5e1;
         }
-        /* Garis potong horizontal baris pertama */
         .cut-horizontal-1 {
             top: 100.67mm;
             left: 0;
             right: 0;
-            border-top: 1px dashed #555;
+            border-top: 1px dashed #cbd5e1;
         }
-        /* Garis potong horizontal baris kedua */
         .cut-horizontal-2 {
             top: 195.33mm;
             left: 0;
             right: 0;
-            border-top: 1px dashed #555;
+            border-top: 1px dashed #cbd5e1;
         }
 
-        /* --- DESAIN LABEL --- */
+        /* --- DESAIN LABEL PREMIUM (CETAK & DIGITAL) --- */
         .label-card {
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-            padding: 4mm;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             height: 100%;
             position: relative;
-            background-color: #fff;
+            background-color: #ffffff;
             box-sizing: border-box;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            z-index: 3; /* Berada di atas garis potong agar tidak mengganggu isi data */
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+            z-index: 3; 
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
+        /* Efek Hover di Tampilan Digital */
         .label-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            transform: scale(1.03) translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 19, 89, 0.15), 0 0 0 4px rgba(26, 115, 232, 0.1);
+            border-color: var(--gemini-blue);
         }
 
+        /* Background Pattern Halus untuk kesan Industrial */
+        .label-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: repeating-linear-gradient(45deg, rgba(0, 19, 89, 0.02) 0, rgba(0, 19, 89, 0.02) 2px, transparent 2px, transparent 8px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .label-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header Industrial Mewah */
         .label-header {
+            background: var(--primary-color);
+            color: #ffffff;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 6px;
-            margin-bottom: 6px;
+            padding: 6px 12px;
+            border-bottom: 3px solid var(--gemini-orange);
         }
 
         .label-header img {
-            max-width: 100px;
+            max-width: 110px;
             height: auto;
+            filter: brightness(0) invert(1); /* Memastikan logo menjadi putih murni */
         }
 
         .label-title {
@@ -289,86 +309,102 @@
 
         .label-title .title-top {
             font-size: 16px;
-            font-weight: 800;
-            color: var(--primary-color);
-            letter-spacing: 1px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 2px;
             line-height: 1;
+            color: #ffffff;
         }
 
         .label-title .title-bottom {
-            font-size: 10px;
-            font-weight: 600;
-            color: #555;
-            letter-spacing: 3.5px;
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 4px;
             text-transform: uppercase;
             margin-top: 4px;
             line-height: 1;
         }
 
         .label-body {
+            padding: 8px 12px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .data-group { display: flex; flex-direction: column; }
+        .data-group { 
+            display: flex; 
+            flex-direction: column; 
+        }
 
         .data-label {
             font-size: 8px;
             text-transform: uppercase;
-            color: #555;
-            font-weight: 600;
-            margin-bottom: 1px;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
 
         .data-value {
-            font-size: 13px;
-            font-weight: 700;
-            color: #000;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
         }
         
-        .part-name { font-size: 13px; color: var(--primary-color); }
+        .part-name { 
+            font-size: 13px; 
+            color: var(--primary-color); 
+            background: rgba(0, 19, 89, 0.04);
+            padding: 4px 6px;
+            border-radius: 4px;
+            border-left: 3px solid var(--gemini-blue);
+        }
 
         .barcode-container {
             text-align: center;
-            margin-top: 2px;
-            padding: 4px;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            background: #fafafa;
+            margin-top: 4px;
+            padding: 6px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            background: #ffffff;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
         }
         
-        .barcode-container svg { max-height: 30px; width: 100%; }
+        .barcode-container svg { max-height: 32px; width: 100%; }
 
         .row-flex {
             display: flex;
             justify-content: space-between;
             align-items: stretch;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 6px;
-            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            padding: 8px;
+            gap: 10px;
         }
 
         .qr-container {
-            width: 55px;
-            height: 55px;
+            width: 60px;
+            height: 60px;
             display: flex;
             justify-content: center;
             align-items: center;
             align-self: center;
+            background: #fff;
+            padding: 2px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .grid-3 {
             display: grid;
             grid-template-columns: 1fr 1.2fr 0.8fr;
-            gap: 5px;
-            border-top: 1.5px dashed #aaa;
-            padding-top: 6px;
+            gap: 8px;
+            border-top: 1.5px dashed #cbd5e1;
+            padding-top: 8px;
             margin-top: auto;
         }
 
@@ -377,23 +413,39 @@
             max-height: 35px;
             overflow: hidden;
             font-size: 11px;
+            font-family: 'Inter', monospace;
+            font-weight: 700;
+            color: var(--primary-color);
         }
 
+        /* Badge Qty Mewah */
         .qty-badge {
-            font-size: 16px;
-            color: var(--accent-color);
-            text-align: right;
+            font-size: 14px;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--gemini-green), #059669);
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+            align-self: flex-start;
+            margin-left: auto;
         }
 
+        /* Footer dengan identitas kreator */
         .label-footer {
-            margin-top: 6px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 3px;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-top: 1px solid var(--border-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 7.5px;
-            color: #444;
+            font-size: 7px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .label-footer .license strong {
+            color: var(--primary-color);
         }
 
         /* --- PRINT CONFIGURATION --- */
@@ -402,6 +454,7 @@
                 background: white !important; 
                 margin: 0;
                 padding: 0;
+                color: black;
             }
             body::before, body::after {
                 display: none !important; 
@@ -421,9 +474,15 @@
                 margin: 0 auto;
                 page-break-after: always;
             }
-            .label-card:hover {
-                transform: none;
-                box-shadow: none;
+            .label-card {
+                transform: none !important;
+                box-shadow: none !important;
+                border-color: var(--primary-color) !important;
+            }
+            .label-header {
+                background-color: var(--primary-color) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             @page {
                 size: A4;
@@ -436,27 +495,28 @@
 
     <div class="control-panel">
         <div class="brand-container">
-            <img src="MSB Logo.png" alt="Logo PT Murinda Sentra Baja" onerror="this.src='Murinda Logo.png'">
+            <!-- Menyesuaikan dengan logo perusahaan -->
+            <img src="MSB Logo.png" alt="Logo PT Murinda Sentra Baja" onerror="this.src='Murinda Logo.png'" style="height:40px;">
             <div class="company-name"></div>
-            <h2>Product Label System</h2>
+            <h2>Product Logistics</h2>
         </div>
 
         <div class="input-group">
-            <label for="deliveryDate">Pilih Tanggal Pengiriman :</label>
+            <label for="deliveryDate">Tanggal Pengiriman:</label>
             <input type="date" id="deliveryDate" onchange="fetchAndGenerate()">
         </div>
 
         <div class="input-group">
-            <label for="clientFilter">Pilih Client :</label>
+            <label for="clientFilter">Filter Client:</label>
             <select id="clientFilter" onchange="fetchAndGenerate()">
                 <option value="">-- Semua Client --</option>
             </select>
         </div>
 
-        <button class="btn-print" id="btnPrint" onclick="window.print()">🖨️ Print Label</button>
+        <button class="btn-print" id="btnPrint" onclick="window.print()">🖨️ Cetak Label</button>
     </div>
 
-    <div class="loading" id="loadingText">Menginisialisasi sistem...</div>
+    <div class="loading" id="loadingText">Loading MSB System...</div>
     
     <div id="printArea"></div>
 
@@ -465,7 +525,7 @@
         
         let spreadsheetData = [];
 
-        // 1. EVENT KETIKA HALAMAN PERTAMA KALI DIBUKA
+        // Inisialisasi awal
         window.addEventListener('DOMContentLoaded', async () => {
             const dateInput = document.getElementById('deliveryDate');
             const today = new Date();
@@ -475,9 +535,7 @@
             dateInput.value = `${yyyy}-${mm}-${dd}`;
 
             const loadingText = document.getElementById('loadingText');
-            
             loadingText.style.display = 'block';
-            loadingText.innerHTML = "Memuat data dari sistem...";
             
             document.getElementById('deliveryDate').disabled = true;
             document.getElementById('clientFilter').disabled = true;
@@ -502,19 +560,17 @@
                 });
 
                 loadingText.style.display = 'none';
-                
                 document.getElementById('deliveryDate').disabled = false;
                 document.getElementById('clientFilter').disabled = false;
 
-                // Tampilkan data otomatis di awal
                 fetchAndGenerate();
 
             } catch (error) {
-                console.error("Error fetching initial data:", error);
-                loadingText.innerHTML = "Gagal memuat data awal. Silakan refresh halaman.";
-                loadingText.style.color = "red";
+                console.error("Error fetching data:", error);
+                loadingText.innerHTML = "Gagal memuat data. Periksa koneksi atau URL Apps Script.";
+                loadingText.style.color = "var(--accent-color)";
                 loadingText.style.background = "none";
-                loadingText.style.webkitTextFillColor = "red";
+                loadingText.style.webkitTextFillColor = "var(--accent-color)";
             }
         });
 
@@ -546,14 +602,11 @@
             const printArea = document.getElementById('printArea');
             const btnPrint = document.getElementById('btnPrint');
 
-            if (!dateInput) {
-                return; 
-            }
+            if (!dateInput) return; 
 
             printArea.innerHTML = '';
             loadingText.style.display = 'block';
-            loadingText.style.color = "transparent";
-            loadingText.innerHTML = "Memproses data label...";
+            loadingText.innerHTML = "Memproses & merender visual label...";
             btnPrint.style.display = 'none';
 
             try {
@@ -567,7 +620,6 @@
                 const filteredData = spreadsheetData.filter(row => {
                     let sheetDate = row["Delivery Date"];
                     let isDateMatch = sheetDate ? parseSheetDate(sheetDate) === dateInput : false;
-                    
                     let sheetClient = row["Client"] ? row["Client"].toString().toLowerCase().trim() : "";
                     let isClientMatch = clientInput === "" || sheetClient === clientInput;
 
@@ -575,14 +627,16 @@
                 });
 
                 if (filteredData.length === 0) {
-                    printArea.innerHTML = `<p style="color:red; font-weight:bold; font-size:16px;">Tidak ada jadwal pengiriman untuk tanggal & client tersebut.</p>`;
+                    printArea.innerHTML = `<div style="text-align:center; padding: 40px; background: rgba(255,255,255,0.8); border-radius: 12px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <h3 style="color:var(--accent-color); font-weight:800; font-size:20px; margin-bottom:8px;">Data Tidak Ditemukan</h3>
+                        <p style="color:var(--text-muted); font-weight:500;">Tidak ada jadwal pengiriman untuk tanggal atau klien yang dipilih.</p>
+                    </div>`;
                     return;
                 }
 
                 const groupedMap = {};
                 filteredData.forEach(row => {
                     const po = row["PO Number"] ? row["PO Number"].trim() : "UNKNOWN";
-                    
                     let rawSn = row["Serial Number"] ? row["Serial Number"].toString().trim() : "";
                     let snMatch = rawSn.match(/\d+$/);
                     let shortSn = snMatch ? snMatch[0].padStart(3, '0').slice(-3) : "000";
@@ -591,7 +645,7 @@
                         groupedMap[po] = {
                             poNumber: po,
                             unitNumber: row["Unit Number"] || "-",
-                            partName: row["Part Name"] || "Counterweight Excavator",
+                            partName: row["Part Name"] || "Counterweight",
                             partNumber: row["Part Number"] || "-",
                             serialNumbers: [shortSn],
                             qty: 1
@@ -610,17 +664,10 @@
                         currentPageDiv = document.createElement('div');
                         currentPageDiv.className = 'a4-page';
                         
-                        // Menambahkan elemen garis potong ke setiap halaman baru yang terbentuk
-                        const lineV = document.createElement('div');
-                        lineV.className = 'cut-line cut-vertical';
-                        const lineH1 = document.createElement('div');
-                        lineH1.className = 'cut-line cut-horizontal-1';
-                        const lineH2 = document.createElement('div');
-                        lineH2.className = 'cut-line cut-horizontal-2';
-                        
-                        currentPageDiv.appendChild(lineV);
-                        currentPageDiv.appendChild(lineH1);
-                        currentPageDiv.appendChild(lineH2);
+                        // Garis potong
+                        currentPageDiv.appendChild(Object.assign(document.createElement('div'), {className: 'cut-line cut-vertical'}));
+                        currentPageDiv.appendChild(Object.assign(document.createElement('div'), {className: 'cut-line cut-horizontal-1'}));
+                        currentPageDiv.appendChild(Object.assign(document.createElement('div'), {className: 'cut-line cut-horizontal-2'}));
                         
                         printArea.appendChild(currentPageDiv);
                     }
@@ -631,17 +678,18 @@
                     const labelHTML = `
                         <div class="label-card">
                             <div class="label-header">
-                                <img src="MSB Logo White.png" alt="PT Murinda Sentra Baja" onerror="this.src='Murinda Logo.png'">
+                                <!-- Logo diubah menggunakan invert di CSS agar menjadi putih, gunakan logo asli MSB -->
+                                <img src="MSB Logo.png" alt="PT Murinda Sentra Baja" onerror="this.src='Murinda Logo.png'">
                                 <div class="label-title">
                                     <div class="title-top">Shipping Mark</div>
-                                    <div class="title-bottom">Logistics</div>
+                                    <div class="title-bottom">MSB Logistics</div>
                                 </div>
                             </div>
                             
                             <div class="label-body">
                                 <div class="data-group">
-                                    <div class="data-label">PO Number</div>
-                                    <div class="data-value">${labelItem.poNumber}</div>
+                                    <div class="data-label">Purchase Order Number</div>
+                                    <div class="data-value" style="font-size: 15px;">${labelItem.poNumber}</div>
                                     <div class="barcode-container">
                                         <svg id="barcode-${index}"></svg>
                                     </div>
@@ -649,9 +697,9 @@
 
                                 <div class="row-flex">
                                     <div class="data-group" style="width: 70%;">
-                                        <div class="data-label">Part Name</div>
+                                        <div class="data-label">Component Name</div>
                                         <div class="data-value part-name">${labelItem.partName}</div>
-                                        <div class="data-label" style="margin-top: 4px;">Part Number</div>
+                                        <div class="data-label" style="margin-top: 6px;">Part Number</div>
                                         <div class="data-value" style="font-size:12px;">${labelItem.partNumber}</div>
                                     </div>
                                     <div class="qr-container" id="qrcode-${index}"></div>
@@ -667,7 +715,7 @@
                                         <div class="data-value serial-box">${sortedSerials}</div>
                                     </div>
                                     <div class="data-group">
-                                        <div class="data-label" style="text-align:right;">Qty</div>
+                                        <div class="data-label" style="text-align:right;">Quantity</div>
                                         <div class="data-value qty-badge">${labelItem.qty} PCS</div>
                                     </div>
                                 </div>
@@ -675,28 +723,32 @@
 
                             <div class="label-footer">
                                 <div><strong>Cetak:</strong> ${printTime}</div>
-                                <div class="license">PT Murinda Sentra Baja, Kalijati - Subang</div>
+                                <div class="license" style="text-align:right;">
+                                    <strong>PT Murinda Sentra Baja</strong>, Kalijati - Subang<br>
+                                    MSB ERP System
+                                </div>
                             </div>
                         </div>
                     `;
 
                     currentPageDiv.insertAdjacentHTML('beforeend', labelHTML);
 
-                    // Barcode PO
+                    // Render Barcode
                     JsBarcode(`#barcode-${index}`, labelItem.poNumber, {
                         format: "CODE128",
                         width: 1.8,
-                        height: 25,
+                        height: 28,
                         displayValue: false,
-                        margin: 0
+                        margin: 0,
+                        lineColor: "#1e293b"
                     });
 
-                    // QR Part Number
+                    // Render QRCode
                     new QRCode(document.getElementById(`qrcode-${index}`), {
                         text: labelItem.partNumber,
                         width: 55,
                         height: 55,
-                        colorDark : "#000000",
+                        colorDark : "#001359", // Menggunakan biru korporat untuk QR
                         colorLight : "#ffffff",
                         correctLevel : QRCode.CorrectLevel.M
                     });
@@ -706,10 +758,8 @@
 
             } catch (error) {
                 console.error("Error:", error);
-                loadingText.innerHTML = "Gagal memproses data. Cek koneksi internet dan link deploy Anda.";
-                loadingText.style.color = "red";
-                loadingText.style.background = "none";
-                loadingText.style.webkitTextFillColor = "red";
+                loadingText.innerHTML = "Gagal memproses visual. Periksa sumber data Anda.";
+                loadingText.style.color = "var(--accent-color)";
             }
         }
     </script>
